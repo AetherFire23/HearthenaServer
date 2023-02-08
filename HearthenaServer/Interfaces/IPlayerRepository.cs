@@ -6,7 +6,8 @@ namespace HearthenaServer.Interfaces
     {
         public Task<Player> GetPlayerById(Guid id);
         public Task<Game> GetGameById(Guid gameId);
-
+        public Task<Player> GetPlayingPlayer(Game game);
+        public Task<Player> GetNonPlayingPlayer(Game game);
 
     }
 }

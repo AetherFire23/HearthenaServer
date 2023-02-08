@@ -15,15 +15,12 @@ builder.Services.AddScoped<ICardPlaySequenceService, CardPlaySequenceService>();
 builder.Services.AddScoped<IPlayerRepository, PlayerRepository>();
 builder.Services.AddScoped<IBoardRepository, BoardRepository>();
 
-
-
 RegisterGameTaskTypes(builder);
 
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
-
 
 //Add db context here
 string connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
@@ -60,11 +57,20 @@ using (var scope = app.Services.CreateScope())
 
 
     // Determine who got the first turn
-    // Draw first cards
+    // Draw first cards (draw more for nd player)
 
+    // First player plays a minion
     
+    // End turn checks
+    // Begin turn actions
 
-    await cardService.PlayCard(ConstDef.Card1Guid, target);
+    // 2nd player plays a spell on heros face
+
+    // end turn (check for game end)
+
+
+
+   // await cardService.PlayCard(ConstDef.Card1Guid, target);
 
     // GameMakerService
 

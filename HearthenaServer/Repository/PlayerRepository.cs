@@ -20,5 +20,19 @@ namespace HearthenaServer.Repository
         {
             return _context.Games.FirstOrDefault(x => x.Id == gameId);
         }
+
+        public async Task<Player> GetPlayingPlayer(Game game)
+        {
+            return game.Player1.IsPlaying
+            ? game.Player1
+            : game.Player2;
+        }
+
+        public async Task<Player> GetNonPlayingPlayer(Game game)
+        {
+            return !game.Player1.IsPlaying
+            ? game.Player1
+            : game.Player2;
+        }
     }
 }
