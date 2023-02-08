@@ -1,3 +1,4 @@
+using HearthenaServer.Entities;
 using Microsoft.AspNetCore.Mvc;
 
 namespace HearthenaServer.Controllers
@@ -7,16 +8,21 @@ namespace HearthenaServer.Controllers
     public class GameController : ControllerBase
     {
         private readonly ILogger<GameController> _logger;
-
-        public GameController(ILogger<GameController> logger)
+        private readonly HearthenaContext _context;
+        public GameController(ILogger<GameController> logger, HearthenaContext context)
         {
             _logger = logger;
+            _context = context;
         }
 
         [HttpPut]
         [Route("PlayCard")]
-        public async Task<ActionResult> PlayCard()
+        public async Task<ActionResult> PlayCard(Dictionary<string, string> onPlayParameters)
         {
+            // sometimes actions are done OnPlay. Player must choose battlecary before playing, by example, so targetId will be contained in onPlayParameters
+
+
+
             return Ok();
             // Test!
         }
@@ -36,11 +42,14 @@ namespace HearthenaServer.Controllers
             return Ok();
         }
 
-        [HttpPut]
-        [Route("MinionAttack")]
-        public async Task<ActionResult> MinionAttack()
+
+
+        [HttpGet]
+        [Route("GetCards")]
+        public async Task<ActionResult<List<Card>>> GetCards()
         {
-            return Ok();
+            var all = _context.Cards.ToList();
+            return Ok(all);
         }
     }
 }
