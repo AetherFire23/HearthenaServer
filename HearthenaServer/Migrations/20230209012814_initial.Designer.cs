@@ -12,7 +12,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace HearthenaServer.Migrations
 {
     [DbContext(typeof(HearthenaContext))]
-    [Migration("20230208175519_initial")]
+    [Migration("20230209012814_initial")]
     partial class initial
     {
         /// <inheritdoc />
@@ -137,6 +137,9 @@ namespace HearthenaServer.Migrations
 
                     b.Property<Guid>("GameId")
                         .HasColumnType("uniqueidentifier");
+
+                    b.Property<bool>("IsPlaying")
+                        .HasColumnType("bit");
 
                     b.Property<int>("ManaCrystals")
                         .HasColumnType("int");

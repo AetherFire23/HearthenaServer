@@ -64,7 +64,6 @@ namespace HearthenaServer.Services
             _context.Add(newMinion);
             await _context.SaveChangesAsync();
 
-            // 
             await _boardRepository.UpdateMinionBoardIndexes(board.Minions);
 
             // Apply BoardEffects

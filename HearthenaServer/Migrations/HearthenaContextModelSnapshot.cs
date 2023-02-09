@@ -135,6 +135,9 @@ namespace HearthenaServer.Migrations
                     b.Property<Guid>("GameId")
                         .HasColumnType("uniqueidentifier");
 
+                    b.Property<bool>("IsPlaying")
+                        .HasColumnType("bit");
+
                     b.Property<int>("ManaCrystals")
                         .HasColumnType("int");
 

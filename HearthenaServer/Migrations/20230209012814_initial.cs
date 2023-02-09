@@ -31,6 +31,7 @@ namespace HearthenaServer.Migrations
                 {
                     Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     ManaCrystals = table.Column<int>(type: "int", nullable: false),
+                    IsPlaying = table.Column<bool>(type: "bit", nullable: false),
                     GameId = table.Column<Guid>(type: "uniqueidentifier", nullable: false)
                 },
                 constraints: table =>
