@@ -3,6 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
 using System.Reflection.Metadata;
 using System.Text.Json.Serialization;
+using WebAPI.GameTasks;
 
 namespace HearthenaServer
 {
@@ -23,31 +24,17 @@ namespace HearthenaServer
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            //modelBuilder.Entity<Card>()
-            //     .Property(p => p.Properties)
-            //     .HasConversion(
-            //    v => JsonConvert.DeserializeObject<Dictionary<string, string>>(v),
-            //    v => JsonConvert.SerializeObject(v));
-
-
             modelBuilder.Entity<Card>()
                  .Property(p => p.Properties)
                  .HasConversion(
                 v => JsonConvert.SerializeObject(v),
                 v => JsonConvert.DeserializeObject<Dictionary<string, string>>(v));
 
-            modelBuilder.Entity<Player>()
-                .HasMany(p => p.AllCards)
-                .WithOne(p => p.Owner)
-                .HasForeignKey(p => p.OwnerId)
-                .OnDelete(DeleteBehavior.NoAction);
+            this.InitializePlayerEntityBuilder(modelBuilder);
 
-            modelBuilder.Entity<Player>()
-                .HasMany(p => p.Minions)
-                .WithOne(p => p.Player)
-                .HasForeignKey(k => k.PlayerId)
-                .OnDelete(DeleteBehavior.NoAction);
-
+            // Declares Game has two players
+            // Players dont have their game because it causes infinite regression for some reason when
+            // not using a virtual List<Player>().
             modelBuilder.Entity<Game>()
                 .HasOne(p => p.Player1)
                 .WithOne()
@@ -59,6 +46,52 @@ namespace HearthenaServer
                 .WithOne()
                 .HasForeignKey<Game>(p => p.Player2Id)
                 .OnDelete(DeleteBehavior.NoAction);
+
+            modelBuilder.Entity<Card>()
+                .Property(p => p.Type)
+                .HasConversion(
+                v => v.ToString(),
+                v => (GameTaskCode)Enum.Parse(typeof(GameTaskCode), v)
+                );
+
+            modelBuilder.Entity<Card>()
+                .Property(p => p.IsInHand)
+                .HasConversion(
+                v => v.ToString(),
+                v => Convert.ToBoolean(v)
+                );
+
+                        modelBuilder.Entity<Card>()
+                .Property(p => p.IsMinion)
+                .HasConversion(
+                v => v.ToString(),
+                v => Convert.ToBoolean(v)
+                );
+        }
+
+        private void InitializePlayerEntityBuilder(ModelBuilder modelBuilder)
+        {
+            // Declares player has card
+            var playerEntity = modelBuilder.Entity<Player>();
+
+            playerEntity
+                .HasMany(p => p.Cards)
+                .WithOne(p => p.Owner)
+                .HasForeignKey(p => p.OwnerId)
+                .OnDelete(DeleteBehavior.NoAction);
+
+            // Declares aplyer has minions
+            playerEntity
+                .HasMany(p => p.Minions)
+                .WithOne(p => p.Player)
+                .HasForeignKey(k => k.PlayerId)
+                .OnDelete(DeleteBehavior.NoAction);
+
+            // setting which generic type to the HasForeignKey<> method defines which entity must be set first.
+            playerEntity
+                .HasOne(p => p.Hero)
+                .WithOne(p => p.Player)
+                .HasForeignKey<Player>(e => e.HeroId);
         }
     }
 }

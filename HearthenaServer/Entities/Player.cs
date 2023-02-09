@@ -8,18 +8,16 @@ namespace HearthenaServer.Entities
     {
         public Guid Id { get; set; }
         public int ManaCrystals { get; set; }
-        public List<Card> AllCards { get; set; }
         public bool IsPlaying {get; set;}
+
         // Navigation
         public virtual List<Minion> Minions { get; set; }
+        public Guid GameId { get; set; } // currently not used
+        public List<Card> Cards { get; set; }
 
-        public Guid GameId { get; set; }
+        public Guid HeroId { get; set; }
+        public virtual Hero Hero { get; set; }
 
 
-
-        public BoardHelper GetBoard()
-        {
-            return new BoardHelper(this.Minions);
-        }
     }
 }

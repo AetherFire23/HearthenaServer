@@ -1,5 +1,6 @@
 ﻿using HearthenaServer.Entities;
 using HearthenaServer.Interfaces;
+using System.Runtime.Intrinsics.X86;
 
 namespace HearthenaServer.Repository
 {
@@ -33,6 +34,17 @@ namespace HearthenaServer.Repository
             return !game.Player1.IsPlaying
             ? game.Player1
             : game.Player2;
+        }
+
+        public async Task<List<Card>> GetCardsInHand(Player player)
+        {
+            var cardsInHand = _context.Cards.Where(c => c.IsInHand && c.OwnerId == player.Id).ToList();
+            return cardsInHand;
+        }
+        public async Task<List<Card>> GetCardsInDeck(Player player)
+        {
+            var cardsInDeck = _context.Cards.Where(c => c.IsInHand == false && c.OwnerId == player.Id).ToList();
+            return cardsInDeck;
         }
     }
 }

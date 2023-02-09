@@ -24,11 +24,6 @@ namespace HearthenaServer.CardServices.Spells
             return false;
         }
 
-
-        // targetType - API
-        // targetId - Unity 
-
-        // damage - API (card)
         public override async Task ApplySpellEffect(Card card, Dictionary<string, string> targetParameters)
         {
             Guid targetId = targetParameters.GetTargetId();

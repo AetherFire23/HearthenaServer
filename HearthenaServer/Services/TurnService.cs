@@ -1,9 +1,13 @@
-﻿using HearthenaServer.Entities;
+﻿using HearthenaServer.Constants;
+using HearthenaServer.Entities;
+using HearthenaServer.Extensions;
 using HearthenaServer.Interfaces;
 using HearthenaServer.Utils;
+using System.Collections;
 
 namespace HearthenaServer.Services
 {
+    // all card draws are random for now because there is not Deck ordering.
     public class TurnService : ITurnService
     {
         private readonly IServiceProvider _serviceProvider;
@@ -22,7 +26,7 @@ namespace HearthenaServer.Services
         public async Task BeginGame(Game game)
         {
             await ChooseFirstPlayer(game);
-            await HandOutCards(game);
+            await HandOutFirstCards(game);
             await BeginTurn(game);
         }
 
@@ -35,18 +39,22 @@ namespace HearthenaServer.Services
             startingPlayer.IsPlaying = true;
         }
 
-        public async Task HandOutCards(Game game)
+        public async Task HandOutFirstCards(Game game)
         {
+            // Get the players Deck are shuffle it
+            Player firstPlayer = await _playerRepository.GetPlayingPlayer(game);
+            Player secondPlayer = await _playerRepository.GetNonPlayingPlayer(game);
 
+            await this.ShuffleAndDrawCards(firstPlayer, ConstDef.FirstPlayerStartingHandCount);
+            await this.ShuffleAndDrawCards(secondPlayer, 2);
         }
 
         public async Task BeginTurn(Game game)
         {
-            var playing = _playerRepository.GetPlayingPlayer(game);
-
-            // program cards
-
+            var playing = await _playerRepository.GetPlayingPlayer(game);
+            await DrawCard(playing);
         }
+
 
         public async Task EndTurn(Game game)
         {
@@ -67,6 +75,24 @@ namespace HearthenaServer.Services
             playingPlayer.IsPlaying = false;
             nonPlayingPlayer.IsPlaying = true;
             await _context.SaveChangesAsync();
+        }
+
+        private async Task ShuffleAndDrawCards(Player player, int cardAmount)
+        {
+            List<Card> cardsInDeck = await _playerRepository.GetCardsInDeck(player);
+            List<Card> shuffled = cardsInDeck.Shuffle();
+
+            for (int i = 0; i < cardAmount; i++)
+            {
+                var card = shuffled.ElementAt(i);
+                card.IsInHand = false;
+            }
+            await _context.SaveChangesAsync();
+        }
+
+        private async Task DrawCard(Player player)
+        {
+            await ShuffleAndDrawCards(player, 1);
         }
     }
 }

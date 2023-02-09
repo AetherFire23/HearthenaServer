@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace HearthenaServer.Migrations
 {
     /// <inheritdoc />
-    public partial class initial : Migration
+    public partial class initia : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -16,9 +16,9 @@ namespace HearthenaServer.Migrations
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    PlayerId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     Health = table.Column<int>(type: "int", nullable: false),
-                    Name = table.Column<string>(type: "nvarchar(max)", nullable: false)
+                    Name = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    PlayerId = table.Column<Guid>(type: "uniqueidentifier", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -32,11 +32,18 @@ namespace HearthenaServer.Migrations
                     Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     ManaCrystals = table.Column<int>(type: "int", nullable: false),
                     IsPlaying = table.Column<bool>(type: "bit", nullable: false),
-                    GameId = table.Column<Guid>(type: "uniqueidentifier", nullable: false)
+                    GameId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    HeroId = table.Column<Guid>(type: "uniqueidentifier", nullable: false)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Players", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Players_Heroes_HeroId",
+                        column: x => x.HeroId,
+                        principalTable: "Heroes",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
@@ -44,9 +51,10 @@ namespace HearthenaServer.Migrations
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    Type = table.Column<int>(type: "int", nullable: false),
+                    Type = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Properties = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    IsMinion = table.Column<bool>(type: "bit", nullable: false),
+                    IsInHand = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    IsMinion = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     BaseCost = table.Column<int>(type: "int", nullable: false),
                     CurrentCost = table.Column<int>(type: "int", nullable: false),
                     OwnerId = table.Column<Guid>(type: "uniqueidentifier", nullable: false)
@@ -126,6 +134,12 @@ namespace HearthenaServer.Migrations
                 name: "IX_Minions_PlayerId",
                 table: "Minions",
                 column: "PlayerId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Players_HeroId",
+                table: "Players",
+                column: "HeroId",
+                unique: true);
         }
 
         /// <inheritdoc />
@@ -138,13 +152,13 @@ namespace HearthenaServer.Migrations
                 name: "Games");
 
             migrationBuilder.DropTable(
-                name: "Heroes");
-
-            migrationBuilder.DropTable(
                 name: "Minions");
 
             migrationBuilder.DropTable(
                 name: "Players");
+
+            migrationBuilder.DropTable(
+                name: "Heroes");
         }
     }
 }

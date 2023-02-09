@@ -54,11 +54,16 @@ namespace HearthenaServer.Services
             // Place on board space
             // Then get a board helper to update the BoardIndexes
             // Cannot have the new minion into the database or else the boardHelper will think it is already on the board.
+            // null exception when no minion exists.
             var newMinion = card.ToMinion();
 
+
             int insertIndex = targetParameters.GetMinionInsertIndex();
-            BoardHelper board = player.GetBoard();
+            BoardHelper board = new BoardHelper(player.Minions);
+
             board.InsertMinionInBoardSpace(newMinion, insertIndex);
+
+
 
             // add minion to database
             _context.Add(newMinion);

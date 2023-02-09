@@ -1,5 +1,6 @@
 ﻿using HearthenaServer.Entities;
-
+using System.Collections;
+using HearthenaServer.Extensions;
 namespace HearthenaServer.Models
 {
     public class BoardHelper
@@ -11,8 +12,9 @@ namespace HearthenaServer.Models
 
         public BoardHelper(List<Minion> minions)
         {
-            var ordered = minions.OrderBy(x => x.BoardIndex).ToList();
-            Minions = ordered;
+            this.Minions = !ListExtensions.IsNullOrEmpty(minions)
+                ? minions.OrderBy(x => x.BoardIndex).ToList()
+                : new List<Minion>();
         }
 
         public void InsertMinionInBoardSpace(Minion minion, int index) // could be other players minion thats why

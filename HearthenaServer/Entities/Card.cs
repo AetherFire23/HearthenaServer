@@ -9,6 +9,11 @@ namespace HearthenaServer.Entities
         public GameTaskCode Type { get; set; }
         public Dictionary<string, string> Properties { get; set; } = new();
 
+        /// <summary>
+        /// Default = true
+        /// </summary>
+        public bool IsInHand { get; set; } = false;
+
         public bool IsMinion { get; set; }
 
         public int BaseCost { get; set; }
@@ -37,11 +42,9 @@ namespace HearthenaServer.Entities
                 GameTaskCode = Type,
                 Attack = attackValue,
                 Health = hp,
+                BoardIndex = -1
             };
             return newMinion;
         }
-
-
-
     }
 }

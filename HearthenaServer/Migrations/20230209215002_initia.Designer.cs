@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace HearthenaServer.Migrations
 {
     [DbContext(typeof(HearthenaContext))]
-    [Migration("20230209012814_initial")]
-    partial class initial
+    [Migration("20230209215002_initia")]
+    partial class initia
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -37,8 +37,13 @@ namespace HearthenaServer.Migrations
                     b.Property<int>("CurrentCost")
                         .HasColumnType("int");
 
-                    b.Property<bool>("IsMinion")
-                        .HasColumnType("bit");
+                    b.Property<string>("IsInHand")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("IsMinion")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<Guid>("OwnerId")
                         .HasColumnType("uniqueidentifier");
@@ -47,8 +52,9 @@ namespace HearthenaServer.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("Type")
-                        .HasColumnType("int");
+                    b.Property<string>("Type")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
 
@@ -138,6 +144,9 @@ namespace HearthenaServer.Migrations
                     b.Property<Guid>("GameId")
                         .HasColumnType("uniqueidentifier");
 
+                    b.Property<Guid>("HeroId")
+                        .HasColumnType("uniqueidentifier");
+
                     b.Property<bool>("IsPlaying")
                         .HasColumnType("bit");
 
@@ -146,13 +155,16 @@ namespace HearthenaServer.Migrations
 
                     b.HasKey("Id");
 
+                    b.HasIndex("HeroId")
+                        .IsUnique();
+
                     b.ToTable("Players");
                 });
 
             modelBuilder.Entity("HearthenaServer.Entities.Card", b =>
                 {
                     b.HasOne("HearthenaServer.Entities.Player", "Owner")
-                        .WithMany("AllCards")
+                        .WithMany("Cards")
                         .HasForeignKey("OwnerId")
                         .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
@@ -192,7 +204,24 @@ namespace HearthenaServer.Migrations
 
             modelBuilder.Entity("HearthenaServer.Entities.Player", b =>
                 {
-                    b.Navigation("AllCards");
+                    b.HasOne("HearthenaServer.Entities.Hero", "Hero")
+                        .WithOne("Player")
+                        .HasForeignKey("HearthenaServer.Entities.Player", "HeroId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Hero");
+                });
+
+            modelBuilder.Entity("HearthenaServer.Entities.Hero", b =>
+                {
+                    b.Navigation("Player")
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("HearthenaServer.Entities.Player", b =>
+                {
+                    b.Navigation("Cards");
 
                     b.Navigation("Minions");
                 });

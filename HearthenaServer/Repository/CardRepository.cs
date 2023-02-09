@@ -20,69 +20,138 @@ namespace HearthenaServer.Repository
             return card;
         }
 
-
-
-
-        public void CreateDummyGame()
+        // Are Dependecies resolved upon SavesCHanges() ? No,
+        public async void SetupDummyPlayerAndCards()
         {
-            Dictionary<string, string> props = new Dictionary<string, string>()
-            {
-                {"hp", "2" },
-                {"atk", "3" }
-            };
-            var gameId = Guid.NewGuid();
-
             var game = new Game()
             {
-                Id = gameId,
+                Id = ConstDef.GameId,
                 Player1Id = ConstDef.Player1Guid,
                 Player2Id = ConstDef.Player2Guid,
+                
             };
-
-
             var player = new Player()
             {
                 Id = ConstDef.Player1Guid,
+                GameId = ConstDef.GameId,
                 ManaCrystals = 0,
-                GameId = gameId,
+                IsPlaying = false,
+                HeroId = ConstDef.Hero1Guid
             };
 
             var player2 = new Player()
             {
                 Id = ConstDef.Player2Guid,
+                GameId = ConstDef.GameId,
                 ManaCrystals = 0,
-                GameId = gameId,
-
+                IsPlaying = false,
+                HeroId = ConstDef.Hero2Guid
 
             };
 
-            var trollCard = new Card()
+            var hero1 = new Hero()
             {
-                Id = ConstDef.Card1Guid,
-                Type = GameTaskCode.Troll,
-                Properties = props,
-                BaseCost = 2,
-                CurrentCost = 2,
-                IsMinion = true,
-                OwnerId = ConstDef.Player1Guid,
-                
+                Id = ConstDef.Hero1Guid,
+                Health = 30,
+                Name = "Yeah",
+                PlayerId = ConstDef.Player1Guid
             };
 
-            var minion = new Minion()
+            var hero2 = new Hero()
             {
-                Health = 0,
-                Attack = 0,
-                GameTaskCode = GameTaskCode.Troll,
-                Id = ConstDef.TrollGuid,
-                PlayerId = ConstDef.Player1Guid,
-                BoardIndex= 77,
+                Id = ConstDef.Hero2Guid,
+                Health = 30,
+                Name = "Yea2h",
+                PlayerId = ConstDef.Player2Guid
             };
 
-            _context.Minions.Add(minion);
-            _context.Games.Add(game);
+            _context.Heroes.Add(hero1);
+            _context.Heroes.Add(hero2);
+
+            int z = 0;
+
+            await _context.SaveChangesAsync();
             _context.Players.Add(player);
             _context.Players.Add(player2);
-            _context.Cards.Add(trollCard);
+
+            await _context.SaveChangesAsync();
+
+
+
+
+
+
+
+            _context.Games.Add(game);
+            await _context.SaveChangesAsync();
+
+
+            for (int i = 0; i < 15; i++)
+            {
+                var card = new Card()
+                {
+                    Id = Guid.NewGuid(),
+                    BaseCost = 0,
+                    CurrentCost= 0,
+                    IsInHand = false,
+                    IsMinion = true,
+                    OwnerId = ConstDef.Player1Guid,
+                    Properties = CardProperties.TrollProperties,
+                    Type = GameTaskCode.Troll,
+                };
+                _context.Cards.Add(card);
+            }
+
+            for (int i = 0; i < 15; i++)
+            {
+                var card = new Card()
+                {
+                    Id = Guid.NewGuid(),
+                    BaseCost = 0,
+                    CurrentCost = 0,
+                    IsInHand = false,
+                    IsMinion = true,
+                    OwnerId = ConstDef.Player2Guid,
+                    Properties = CardProperties.TrollProperties,
+                    Type = GameTaskCode.Troll,
+                };
+                _context.Cards.Add(card);
+
+            }
+
+            for (int i = 0; i < 15; i++)
+            {
+                var fireSPell = new Card()
+                {
+                    Id = Guid.NewGuid(),
+                    BaseCost = 0,
+                    CurrentCost = 0,
+                    IsMinion = false,
+                    OwnerId = ConstDef.Player1Guid,
+                    Properties = CardProperties.FireBallProperties,
+                    Type = GameTaskCode.FireBall,
+                    IsInHand= false,
+                };
+
+                _context.Cards.Add(fireSPell);
+            }
+            for (int i = 0; i < 15; i++)
+            {
+                var fireSPell = new Card()
+                {
+                    Id = Guid.NewGuid(),
+                    BaseCost = 0,
+                    CurrentCost = 0,
+                    IsMinion = false,
+                    OwnerId = ConstDef.Player2Guid,
+                    Properties = CardProperties.FireBallProperties,
+                    Type = GameTaskCode.FireBall,
+                    IsInHand= false,
+                    
+                };
+
+                _context.Cards.Add(fireSPell);
+            }
             _context.SaveChanges();
         }
     }

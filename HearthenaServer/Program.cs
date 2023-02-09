@@ -1,9 +1,11 @@
 using HearthenaServer;
 using HearthenaServer.Constants;
+using HearthenaServer.Entities;
 using HearthenaServer.Interfaces;
 using HearthenaServer.Repository;
 using HearthenaServer.Services;
 using Microsoft.EntityFrameworkCore;
+using Newtonsoft.Json;
 using System.Reflection;
 using WebAPI.GameTasks;
 
@@ -14,6 +16,7 @@ builder.Services.AddScoped<ICardRepository, CardRepository>();
 builder.Services.AddScoped<ICardPlaySequenceService, CardPlaySequenceService>();
 builder.Services.AddScoped<IPlayerRepository, PlayerRepository>();
 builder.Services.AddScoped<IBoardRepository, BoardRepository>();
+builder.Services.AddScoped<ITurnService, TurnService>();
 
 RegisterGameTaskTypes(builder);
 
@@ -36,48 +39,51 @@ using (var scope = app.Services.CreateScope())
 {
 
     // this deletes and recreates the whole databse when it is launched.
-    var playerContextService = scope.ServiceProvider.GetService<HearthenaContext>();
-    playerContextService.Database.EnsureDeleted(); // deocher our recommecner
-    playerContextService.Database.Migrate();
+    var context = scope.ServiceProvider.GetService<HearthenaContext>();
+    context.Database.EnsureDeleted(); // deocher our recommecner
+    context.Database.Migrate();
 
 
-    var gameMakerService = scope.ServiceProvider.GetService<ICardRepository>();
-    var cardService = scope.ServiceProvider.GetService<ICardPlaySequenceService>();
+    var cardRepository = scope.ServiceProvider.GetService<ICardRepository>();
+    var cardPlayService = scope.ServiceProvider.GetService<ICardPlaySequenceService>();
+    ITurnService turnservice = scope.ServiceProvider.GetService<ITurnService>();
+    IPlayerRepository playerRepository = scope.ServiceProvider.GetService<IPlayerRepository>();
 
 
 
-    var target = new Dictionary<string, string>()
+    //var target = new Dictionary<string, string>()
+    //{
+    //    {StringParameters.MinionInsertIndex, "4" }
+    //};
+
+    cardRepository.SetupDummyPlayerAndCards();
+    var dummyGame = context.Games.FirstOrDefault();
+    await turnservice.BeginGame(dummyGame);
+
+    Player first = await playerRepository.GetPlayingPlayer(dummyGame);
+    var firstplayerCard = first.Cards.FirstOrDefault(c => c.IsMinion);
+    var targetParameters = new Dictionary<string, string>()
     {
-        {StringParameters.MinionInsertIndex, "4" }
+        {StringParameters.MinionInsertIndex, "0" }
     };
 
+    await cardPlayService.PlayCard(firstplayerCard.Id, targetParameters);
+    await turnservice.EndTurn(dummyGame);
+    await turnservice.BeginTurn(dummyGame);
 
+    // setup second card to be a spell 
+    var oppositeMinon = context.Minions.FirstOrDefault(x => x.PlayerId == first.Id);
+    var fireSpellTargetParameters = new Dictionary<string, string>()
+    {
+        { StringParameters.TargetId, oppositeMinon.Id.ToString()},
+        { StringParameters.TargetType, JsonConvert.SerializeObject(typeof(Minion))}
 
-    gameMakerService.CreateDummyGame();
+    };
+    // problem : chosen randomly ! 
+    var second = await playerRepository.GetPlayingPlayer(dummyGame);
+    var firstFireSpell = second.Cards.FirstOrDefault(c => !c.IsMinion);
 
-
-    // Determine who got the first turn
-    // Draw first cards (draw more for nd player)
-
-    // First player plays a minion
-    
-    // End turn checks
-    // Begin turn actions
-
-    // 2nd player plays a spell on heros face
-
-    // end turn (check for game end)
-
-
-
-   // await cardService.PlayCard(ConstDef.Card1Guid, target);
-
-    // GameMakerService
-
-    // 
-
-
-
+    await cardPlayService.PlayCard(firstFireSpell.Id, fireSpellTargetParameters);
 
 
 
