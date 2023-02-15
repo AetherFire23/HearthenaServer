@@ -14,5 +14,8 @@
         public static Guid TrollGuid = new Guid("76dd1ba3-7d17-44af-92ad-6cb24039cb42");
 
         public static int FirstPlayerStartingHandCount = 2; 
+
+
+
     }
 }

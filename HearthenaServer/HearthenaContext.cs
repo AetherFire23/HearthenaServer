@@ -67,6 +67,12 @@ namespace HearthenaServer
                 v => v.ToString(),
                 v => Convert.ToBoolean(v)
                 );
+
+
+            modelBuilder.Entity<Hero>()
+                .HasOne(p => p.Weapon)
+                .WithOne(p => p.Hero)
+                .HasForeignKey<Hero>(p => p.WeaponId);
         }
 
         private void InitializePlayerEntityBuilder(ModelBuilder modelBuilder)
@@ -92,6 +98,7 @@ namespace HearthenaServer
                 .HasOne(p => p.Hero)
                 .WithOne(p => p.Player)
                 .HasForeignKey<Player>(e => e.HeroId);
+
         }
     }
 }

@@ -1,4 +1,6 @@
-﻿using HearthenaServer.Enums;
+﻿using HearthenaServer.Constants;
+using HearthenaServer.Enums;
+using Newtonsoft.Json;
 using WebAPI.GameTasks;
 
 namespace HearthenaServer.Entities
@@ -21,15 +23,8 @@ namespace HearthenaServer.Entities
         public int CurrentCost { get; set; }
 
         public Guid OwnerId { get; set; }
-        public Player Owner { get; set; }
+        public virtual Player Owner { get; set; }
 
-        //public bool IsMinion()
-        //{
-        //    bool isMinion = this.Properties.GetValueOrDefault("isMinion") == "True";
-        //    return isMinion;
-        //}
-
-        // public bool IsMinion => this.Properties.GetValueOrDefault("isMinion") == "True";
 
         public Minion ToMinion()
         {
@@ -42,9 +37,20 @@ namespace HearthenaServer.Entities
                 GameTaskCode = Type,
                 Attack = attackValue,
                 Health = hp,
-                BoardIndex = -1
+                BoardIndex = -1 
             };
             return newMinion;
+        }
+
+        public static Dictionary<string, string> CreateTargetParameters(Guid targetId, Type targetType)
+        {
+            var fireSpellTargetParameters = new Dictionary<string, string>()
+            {
+                {StringParameters.TargetId, targetId.ToString() },
+                { StringParameters.TargetType, JsonConvert.SerializeObject(targetType) }
+            };
+
+            return fireSpellTargetParameters;
         }
     }
 }

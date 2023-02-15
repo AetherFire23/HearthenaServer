@@ -11,19 +11,22 @@ namespace HearthenaServer.Services
     public class CardPlaySequenceService : ICardPlaySequenceService
     {
         private readonly ICardRepository _cardRepository;
+        private readonly IServiceRepository _serviceRepository;
         private readonly IServiceProvider _serviceProvider;
         private readonly IPlayerRepository _playerRepository;
         private readonly IBoardRepository _boardRepository;
         private readonly HearthenaContext _context;
 
         public CardPlaySequenceService(ICardRepository cardRepository, IServiceProvider serviceProvider, IPlayerRepository playerRepository, HearthenaContext context,
-            IBoardRepository boardRepository)
+            IBoardRepository boardRepository,
+            IServiceRepository serviceRepository)
         {
             _cardRepository = cardRepository;
             _serviceProvider = serviceProvider;
             _playerRepository = playerRepository;
             _context = context;
             _boardRepository = boardRepository;
+            _serviceRepository = serviceRepository;
         }
 
         public async Task PlayCard(Guid cardId, Dictionary<string, string> targetParameters)
@@ -31,18 +34,19 @@ namespace HearthenaServer.Services
             Card card = await _cardRepository.GetCardById(cardId);
 
             bool isMinion = card.IsMinion;
+            object cardService = _serviceRepository.GetGameTaskService(card);
             if (isMinion)
             {
-                await PlayMinionSequence(card, targetParameters);
+                await PlayMinionSequence(cardService as MinionBase, card, targetParameters);
             }
 
             else
             {
-                await PlaySpellSequence(card, targetParameters);
+                await PlaySpellSequence(cardService as SpellBase, card, targetParameters);
             }
         }
 
-        public async Task PlayMinionSequence(Card card, Dictionary<string, string> targetParameters)
+        public async Task PlayMinionSequence(MinionBase minionBase ,Card card, Dictionary<string, string> targetParameters)
         {
             var serviceType = GameTaskTypeSelector.GetGameTaskType(card.Type);
             var gameTask = _serviceProvider.GetService(serviceType) as MinionBase;
@@ -57,13 +61,10 @@ namespace HearthenaServer.Services
             // null exception when no minion exists.
             var newMinion = card.ToMinion();
 
-
             int insertIndex = targetParameters.GetMinionInsertIndex();
             BoardHelper board = new BoardHelper(player.Minions);
 
             board.InsertMinionInBoardSpace(newMinion, insertIndex);
-
-
 
             // add minion to database
             _context.Add(newMinion);
@@ -76,7 +77,7 @@ namespace HearthenaServer.Services
             await gameTask.ApplyOnBoardEffect();
         }
 
-        public async Task PlaySpellSequence(Card card, Dictionary<string, string> targetParameters)
+        public async Task PlaySpellSequence(SpellBase spellbase, Card card, Dictionary<string, string> targetParameters)
         {
             var serviceType = GameTaskTypeSelector.GetGameTaskType(card.Type);
             var gameTask = _serviceProvider.GetService(serviceType) as SpellBase; // ass SpellBase

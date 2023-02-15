@@ -10,6 +10,8 @@ namespace HearthenaServer.Interfaces
         public Task<Player> GetNonPlayingPlayer(Game game);
         public Task<List<Card>> GetCardsInHand(Player player);
         public Task<List<Card>> GetCardsInDeck(Player player);
+        public Task<ICharacter> GetTarget(Guid targetId, Type targetType);
+        public Task<ICharacter> GetTarget(Dictionary<string, string> targetParameters);
 
     }
 }

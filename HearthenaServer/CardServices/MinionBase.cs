@@ -1,4 +1,5 @@
 using HearthenaServer.CardServices;
+using HearthenaServer.Interfaces;
 using Newtonsoft.Json;
 namespace WebAPI.GameTasks
 {
@@ -16,6 +17,21 @@ namespace WebAPI.GameTasks
         public abstract Task ApplyBattleCry(Dictionary<string, string> parameters);
         public abstract void ApplyDeathRattle();
 
+        // ApplyDivineSHield
+        protected void ApplyOnDamageEffect(ICharacter other, ICharacter self) // IDamageSource ? 
+        {
+            // if Properties.HasDivineSHield
+            // if (Properties.Has
+
+
+            
+        }
+
+        protected void OnDealDamage(ICharacter attacker)
+        {
+
+        }
+
         protected void SomeSharedLogic()
         {
 
@@ -23,6 +39,11 @@ namespace WebAPI.GameTasks
 
         // should be other repo for now
         protected bool HasTaunts()
+        {
+            return true;
+        }
+
+        protected bool HasDivineShield()
         {
             return true;
         }

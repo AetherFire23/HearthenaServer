@@ -89,6 +89,9 @@ namespace HearthenaServer.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
+                    b.Property<int>("Attack")
+                        .HasColumnType("int");
+
                     b.Property<int>("Health")
                         .HasColumnType("int");
 
@@ -99,7 +102,13 @@ namespace HearthenaServer.Migrations
                     b.Property<Guid>("PlayerId")
                         .HasColumnType("uniqueidentifier");
 
+                    b.Property<Guid>("WeaponId")
+                        .HasColumnType("uniqueidentifier");
+
                     b.HasKey("Id");
+
+                    b.HasIndex("WeaponId")
+                        .IsUnique();
 
                     b.ToTable("Heroes");
                 });
@@ -158,6 +167,29 @@ namespace HearthenaServer.Migrations
                     b.ToTable("Players");
                 });
 
+            modelBuilder.Entity("HearthenaServer.Entities.Weapon", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<int>("Attack")
+                        .HasColumnType("int");
+
+                    b.Property<int>("Charges")
+                        .HasColumnType("int");
+
+                    b.Property<Guid>("HeroId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<int>("Type")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Weapon");
+                });
+
             modelBuilder.Entity("HearthenaServer.Entities.Card", b =>
                 {
                     b.HasOne("HearthenaServer.Entities.Player", "Owner")
@@ -186,6 +218,17 @@ namespace HearthenaServer.Migrations
                     b.Navigation("Player1");
 
                     b.Navigation("Player2");
+                });
+
+            modelBuilder.Entity("HearthenaServer.Entities.Hero", b =>
+                {
+                    b.HasOne("HearthenaServer.Entities.Weapon", "Weapon")
+                        .WithOne("Hero")
+                        .HasForeignKey("HearthenaServer.Entities.Hero", "WeaponId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Weapon");
                 });
 
             modelBuilder.Entity("HearthenaServer.Entities.Minion", b =>
@@ -221,6 +264,12 @@ namespace HearthenaServer.Migrations
                     b.Navigation("Cards");
 
                     b.Navigation("Minions");
+                });
+
+            modelBuilder.Entity("HearthenaServer.Entities.Weapon", b =>
+                {
+                    b.Navigation("Hero")
+                        .IsRequired();
                 });
 #pragma warning restore 612, 618
         }

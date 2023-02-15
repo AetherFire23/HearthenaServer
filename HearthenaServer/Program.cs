@@ -1,6 +1,7 @@
 using HearthenaServer;
 using HearthenaServer.Constants;
 using HearthenaServer.Entities;
+using HearthenaServer.Enums;
 using HearthenaServer.Interfaces;
 using HearthenaServer.Repository;
 using HearthenaServer.Services;
@@ -17,6 +18,9 @@ builder.Services.AddScoped<ICardPlaySequenceService, CardPlaySequenceService>();
 builder.Services.AddScoped<IPlayerRepository, PlayerRepository>();
 builder.Services.AddScoped<IBoardRepository, BoardRepository>();
 builder.Services.AddScoped<ITurnService, TurnService>();
+builder.Services.AddScoped<IServiceRepository, ServiceRepository>();
+builder.Services.AddScoped<ITradeService, TradeService>();
+
 
 RegisterGameTaskTypes(builder);
 
@@ -48,45 +52,59 @@ using (var scope = app.Services.CreateScope())
     var cardPlayService = scope.ServiceProvider.GetService<ICardPlaySequenceService>();
     ITurnService turnservice = scope.ServiceProvider.GetService<ITurnService>();
     IPlayerRepository playerRepository = scope.ServiceProvider.GetService<IPlayerRepository>();
+    ITradeService tradeService = scope.ServiceProvider.GetService<ITradeService>();
 
 
 
-    //var target = new Dictionary<string, string>()
-    //{
-    //    {StringParameters.MinionInsertIndex, "4" }
-    //};
 
+    // setyp
     cardRepository.SetupDummyPlayerAndCards();
     var dummyGame = context.Games.FirstOrDefault();
-    await turnservice.BeginGame(dummyGame);
+    var playingPlayer = await playerRepository.GetPlayingPlayer(dummyGame);
 
-    Player first = await playerRepository.GetPlayingPlayer(dummyGame);
-    var firstplayerCard = first.Cards.FirstOrDefault(c => c.IsMinion);
-    var targetParameters = new Dictionary<string, string>()
+    // play troll at index 0 (first)
+    var trollcard = playingPlayer.Cards.FirstOrDefault(c => c.IsMinion && c.OwnerId == playingPlayer.Id);
+    var minionIndex = new Dictionary<string, string>()
     {
         {StringParameters.MinionInsertIndex, "0" }
     };
+    await cardPlayService.PlayCard(trollcard.Id, minionIndex);
 
-    await cardPlayService.PlayCard(firstplayerCard.Id, targetParameters);
-    await turnservice.EndTurn(dummyGame);
-    await turnservice.BeginTurn(dummyGame);
 
-    // setup second card to be a spell 
-    var oppositeMinon = context.Minions.FirstOrDefault(x => x.PlayerId == first.Id);
-    var fireSpellTargetParameters = new Dictionary<string, string>()
-    {
-        { StringParameters.TargetId, oppositeMinon.Id.ToString()},
-        { StringParameters.TargetType, JsonConvert.SerializeObject(typeof(Minion))}
+    // get troll reference and hero reference
+    var troll = playingPlayer.Minions.First();
+    var p1hero = await tradeService.GetTarget(dummyGame.Player1.Hero.Id);
 
-    };
-    // problem : chosen randomly ! 
-    var second = await playerRepository.GetPlayingPlayer(dummyGame);
-    var firstFireSpell = second.Cards.FirstOrDefault(c => !c.IsMinion);
+    var test = Enchant.TryGetEnchant<bool>(EnchantmentType.DivineShield);
 
-    await cardPlayService.PlayCard(firstFireSpell.Id, fireSpellTargetParameters);
+    int i = 0;
+   // 
+
+    //await tradeService.TradeCharacters(p1hero, troll);
 
 
 
+    //await turnservice.BeginGame(dummyGame);
+
+    //Player first = await playerRepository.GetPlayingPlayer(dummyGame);
+    //var trollcard = first.Cards.FirstOrDefault(c => c.IsMinion && c.OwnerId == first.Id);
+    //var minionIndex = new Dictionary<string, string>()
+    //{
+    //    {StringParameters.MinionInsertIndex, "0" }
+    //};
+
+    //await cardPlayService.PlayCard(trollcard.Id, minionIndex);
+    //await turnservice.EndTurn(dummyGame);
+    //await turnservice.BeginTurn(dummyGame);
+
+    //// setup second card to be a spell 
+    //var oppositeMinon = context.Minions.FirstOrDefault(x => x.PlayerId == first.Id);
+    //var fireSpellTargetParameters = Card.CreateTargetParameters(oppositeMinon.Id, typeof(Minion));
+    //// problem : chosen randomly ! 
+    //var second = await playerRepository.GetPlayingPlayer(dummyGame);
+    //var firstFireSpell = second.Cards.FirstOrDefault(c => !c.IsMinion);
+
+    //await cardPlayService.PlayCard(firstFireSpell.Id, fireSpellTargetParameters);
 }
 
 // Configure the HTTP request pipeline.

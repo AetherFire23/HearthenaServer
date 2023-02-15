@@ -1,5 +1,8 @@
 ﻿using HearthenaServer.Entities;
+using HearthenaServer.Extensions;
 using HearthenaServer.Interfaces;
+using Microsoft.AspNetCore.Mvc.ModelBinding.Binders;
+using Microsoft.EntityFrameworkCore;
 using System.Runtime.Intrinsics.X86;
 
 namespace HearthenaServer.Repository
@@ -13,13 +16,31 @@ namespace HearthenaServer.Repository
         }
         public async Task<Player> GetPlayerById(Guid id)
         {
-            var player = _context.Players.FirstOrDefault(p => p.Id == id);
+            var player = await _context.Players.FirstOrDefaultAsync(p => p.Id == id);
             return player;
+        }
+
+        public async Task<ICharacter> GetTarget(Guid targetId, Type targetType)
+        {
+            ICharacter attackedTarget = targetType == typeof(Minion)
+                ? await _context.Minions.FirstOrDefaultAsync(x => x.Id == targetId) as ICharacter
+                : await _context.Heroes.FirstOrDefaultAsync(x => x.Id == targetId) as ICharacter;
+
+            if (attackedTarget is null) throw new ArgumentNullException($"Either {targetId} or {targetType} was null.");
+
+            return attackedTarget;
+        }
+
+        public async Task<ICharacter> GetTarget(Dictionary<string, string> targetParameters)
+        {
+            Guid targetId = targetParameters.GetTargetId();
+            Type targetType = targetParameters.GetTargetType();
+            return await this.GetTarget(targetId, targetType);
         }
 
         public async Task<Game> GetGameById(Guid gameId)
         {
-            return _context.Games.FirstOrDefault(x => x.Id == gameId);
+            return await _context.Games.FirstOrDefaultAsync(x => x.Id == gameId);
         }
 
         public async Task<Player> GetPlayingPlayer(Game game)
@@ -38,12 +59,12 @@ namespace HearthenaServer.Repository
 
         public async Task<List<Card>> GetCardsInHand(Player player)
         {
-            var cardsInHand = _context.Cards.Where(c => c.IsInHand && c.OwnerId == player.Id).ToList();
+            var cardsInHand = await _context.Cards.Where(c => c.IsInHand && c.OwnerId == player.Id).ToListAsync();
             return cardsInHand;
         }
         public async Task<List<Card>> GetCardsInDeck(Player player)
         {
-            var cardsInDeck = _context.Cards.Where(c => c.IsInHand == false && c.OwnerId == player.Id).ToList();
+            var cardsInDeck = await _context.Cards.Where(c => c.IsInHand == false && c.OwnerId == player.Id).ToListAsync();
             return cardsInDeck;
         }
     }

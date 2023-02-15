@@ -9,10 +9,12 @@ namespace HearthenaServer.CardServices.Spells
     [GameTask(GameTaskCode.FireBall)]
     public class FireBallLogic : SpellBase
     {
+        private readonly IPlayerRepository _playerRepository;
         private readonly HearthenaContext _context;
-        public FireBallLogic(HearthenaContext context)
+        public FireBallLogic(HearthenaContext context, IPlayerRepository playerRepository)
         {
             _context = context;
+            _playerRepository = playerRepository;
         }
 
         public override bool IsPlayable()
@@ -26,19 +28,10 @@ namespace HearthenaServer.CardServices.Spells
 
         public override async Task ApplySpellEffect(Card card, Dictionary<string, string> targetParameters)
         {
-            Guid targetId = targetParameters.GetTargetId();
             int damage = card.Properties.GetSpellDamage();
-
-            Type targetType = targetParameters.GetTargetType();
-
-
-            // may not be tracked because of casting
-            IHealth attackedTarget = targetType == typeof(Minion)
-                ? _context.Minions.FirstOrDefault(x => x.Id == targetId) as IHealth
-                : _context.Heroes.FirstOrDefault(x => x.Id == targetId) as IHealth;
-
+            ICharacter attackedTarget = await _playerRepository.GetTarget(targetParameters).ConfigureAwait(false);
             attackedTarget.Health -= damage;
-            await _context.SaveChangesAsync();
+            await _context.SaveChangesAsync().ConfigureAwait(false);
         }
     }
 }
