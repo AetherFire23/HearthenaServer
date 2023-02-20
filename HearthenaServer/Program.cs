@@ -57,8 +57,15 @@ using (var scope = app.Services.CreateScope())
     IPlayerRepository playerRepository = scope.ServiceProvider.GetService<IPlayerRepository>();
     ITradeService tradeService = scope.ServiceProvider.GetService<ITradeService>();
 
+
+
+
+
+
     // setyp
-    cardRepository.SetupDummyPlayerAndCards();
+    await cardRepository.SetupDummyPlayerAndCards();
+
+   
     var dummyGame = context.Games.FirstOrDefault();
     var playingPlayer = await playerRepository.GetPlayingPlayer(dummyGame);
 
@@ -73,7 +80,8 @@ using (var scope = app.Services.CreateScope())
 
     // get troll reference and hero reference
     var p1troll = playingPlayer.Minions.First();
-    var p1hero = await tradeService.GetTarget(dummyGame.Player1.Hero.Id);
+    //  var p1hero = await tradeService.GetTarget(dummyGame.Player1.Hero.Id);
+    var p1hero = await playerRepository.GetTargetById(dummyGame.Player1.Hero.Id);
 
     await tradeService.TradeCharacters(p1hero, p1troll);
 

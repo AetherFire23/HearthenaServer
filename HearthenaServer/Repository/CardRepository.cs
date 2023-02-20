@@ -27,7 +27,7 @@ namespace HearthenaServer.Repository
         }
 
         // Are Dependecies resolved upon SavesCHanges() ? No,
-        public async void SetupDummyPlayerAndCards()
+        public async Task SetupDummyPlayerAndCards()
         {
             var game = new Game()
             {
@@ -173,7 +173,7 @@ namespace HearthenaServer.Repository
 
                 _context.Cards.Add(fireSPell);
             }
-            _context.SaveChanges();
+            await _context.SaveChangesAsync();
         }
     }
 }

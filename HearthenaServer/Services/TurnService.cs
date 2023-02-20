@@ -79,7 +79,7 @@ namespace HearthenaServer.Services
 
         private async Task ShuffleAndDrawCards(Player player, int cardAmount)
         {
-            List<Card> cardsInDeck = await _playerRepository.GetCardsInDeck(player);
+            List<Card> cardsInDeck = await _playerRepository.GetCardsInDeck(player.Id);
             List<Card> shuffled = cardsInDeck.Shuffle();
 
             for (int i = 0; i < cardAmount; i++)

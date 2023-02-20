@@ -6,7 +6,7 @@ namespace HearthenaServer.Models
     public class GameState
     {
 
-        public PlayerDTO Player { get; set; }
-        public PlayerDTO Player2 { get; set; }
+        public PlayerDTO LocalPlayer { get; set; }
+        public PlayerDTO Opponent { get; set; }
     }
 }

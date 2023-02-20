@@ -20,9 +20,9 @@ namespace Shared_Models.UnityCardsLogic
             throw new NotImplementedException();
         }
 
-        public override bool IsPlayable(GameState gameState) // GameState que ca passe I guess ???
+        public override bool IsPlayable(GameState gameState) 
         {
-            return false;
+            throw new NotImplementedException();
         }
 
         public override bool IsValidTarget()

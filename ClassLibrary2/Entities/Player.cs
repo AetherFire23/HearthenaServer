@@ -1,4 +1,5 @@
 ﻿using HearthenaServer.Models;
+using Shared_Models.DTO;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Runtime.CompilerServices;
 
@@ -18,4 +19,7 @@ namespace HearthenaServer.Entities
         public Guid HeroId { get; set; }
         public virtual Hero Hero { get; set; }
     }
+
+
+
 }

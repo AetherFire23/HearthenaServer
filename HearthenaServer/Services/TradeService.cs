@@ -84,21 +84,5 @@ namespace HearthenaServer.Services
             await _context.SaveChangesAsync();
 
         }
-
-        public async Task<ICharacter> GetTarget(Guid targetId)
-        {
-            // Question Ben : caster des entities ds un select, comment on ferait ca ?
-
-            ICharacter target;
-
-            target = await _context.Minions.FirstOrDefaultAsync(x => x.Id == targetId);
-
-            if (target is null)
-            {
-                target = await _context.Heroes.FirstOrDefaultAsync(x => x.Id == targetId);
-            }
-
-            return target;
-        }
     }
 }

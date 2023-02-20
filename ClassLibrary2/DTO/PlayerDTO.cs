@@ -18,5 +18,9 @@ namespace Shared_Models.DTO
 
         public int Mana { get; set; }
 
+        public List<Card> CardsInHand { get; set; }
+
+        public int CardsInDeckCount { get; set; }
+
     }
 }

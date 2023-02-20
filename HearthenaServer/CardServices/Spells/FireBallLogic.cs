@@ -3,12 +3,13 @@ using HearthenaServer.Extensions;
 using HearthenaServer.Interfaces;
 using HearthenaServer.Models;
 using Newtonsoft.Json;
+using Shared_Models.UnityCardsLogic;
 using WebAPI.GameTasks;
 
 namespace HearthenaServer.CardServices.Spells
 {
     [GameTask(GameTaskCode.FireBall)]
-    public class FireBallLogic : SpellBase // abstract pr impleter ds unity 
+    public class FireBallLogic : FireSpellBase // abstract pr impleter ds unity 
     {
         private readonly IPlayerRepository _playerRepository;
         private readonly HearthenaContext _context;
@@ -26,12 +27,12 @@ namespace HearthenaServer.CardServices.Spells
 
         public override bool IsPlayable(GameState gameState)
         {
-            return false;
+            return base.IsPlayable(gameState);
         }
 
         public override bool IsValidTarget() // implemented ds le abstract
         {
-            return false;
+            return base.IsValidTarget();
         }
 
         public override async Task ApplySpellEffect(Card card, Dictionary<string, string> targetParameters)
