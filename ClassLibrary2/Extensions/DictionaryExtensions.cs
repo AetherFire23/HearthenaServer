@@ -1,6 +1,5 @@
 ﻿using HearthenaServer.Constants;
 using HearthenaServer.Entities;
-using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
 using System.Security.Cryptography.Xml;
 

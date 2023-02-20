@@ -49,7 +49,7 @@ namespace HearthenaServer.Services
         public async Task PlayMinionSequence(MinionBase minionBase ,Card card, Dictionary<string, string> targetParameters)
         {
             var serviceType = GameTaskTypeSelector.GetGameTaskType(card.Type);
-            var gameTask = _serviceProvider.GetService(serviceType) as MinionBase;
+            MinionBase gameTask = _serviceProvider.GetService(serviceType) as MinionBase;
 
             // Reduce player mana crystals
             var player = await _playerRepository.GetPlayerById(card.OwnerId);
@@ -80,7 +80,7 @@ namespace HearthenaServer.Services
         public async Task PlaySpellSequence(SpellBase spellbase, Card card, Dictionary<string, string> targetParameters)
         {
             var serviceType = GameTaskTypeSelector.GetGameTaskType(card.Type);
-            var gameTask = _serviceProvider.GetService(serviceType) as SpellBase; // ass SpellBase
+            SpellBase gameTask = _serviceProvider.GetService(serviceType) as SpellBase; // ass SpellBase
 
             // reduce mana crystals
             var player = await _playerRepository.GetPlayerById(card.OwnerId);

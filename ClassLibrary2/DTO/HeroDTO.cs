@@ -1,21 +1,23 @@
-﻿using HearthenaServer.Interfaces;
+﻿using HearthenaServer.Entities;
 using System.ComponentModel.DataAnnotations.Schema;
+using HearthenaServer.Enums;
 
-namespace HearthenaServer.Entities
+namespace HearthenaServer.DTO
 {
-    public class Hero : ICharacter
+    // 
+    public class HeroDTO // trimmed 
     {
         public Guid Id { get; set; }
         public int Health { get; set; } = 30;
         public string Name { get; set; } = string.Empty;
         public int Attack { get; set; } = 0;
 
-        // nav
-        public Guid WeaponId { get; set; }
-        public virtual Weapon Weapon { get; set; }
-        public Guid PlayerId { get; set; }
 
-        public virtual Player Player { get; set; }
+
+        public Weapon Weapon { get; set; }
+
+
+
 
         [NotMapped]
         public bool IsMinion => this.GetType() == typeof(Minion);

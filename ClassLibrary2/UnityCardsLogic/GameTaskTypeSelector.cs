@@ -7,7 +7,7 @@ namespace WebAPI.GameTasks
     {
         private static readonly IReadOnlyDictionary<GameTaskCode, Type> _gameTasksMap = CreateTaskTypesMap();
 
-        public static Type GetGameTaskType(GameTaskCode taskCode)
+        public static Type GetGameTaskType(GameTaskCode taskCode) // bool de + isUnityRequest
         {
             if (!_gameTasksMap.ContainsKey(taskCode))
             {
@@ -26,6 +26,7 @@ namespace WebAPI.GameTasks
                 var attr = CustomAttributeExtensions.GetCustomAttribute<GameTaskAttribute>(gameTaskType);
 
                 gameTasksMap.Add(attr.TaskCode, gameTaskType);
+                // gametaskUNityMap
             }
 
             return new ConcurrentDictionary<GameTaskCode, Type>(gameTasksMap);
@@ -39,5 +40,7 @@ namespace WebAPI.GameTasks
                     && CustomAttributeExtensions.GetCustomAttribute<GameTaskAttribute>(type) != null)
                 .ToList();
         }
+
+        // en prendrait une 2e pour uniy 
     }
 }

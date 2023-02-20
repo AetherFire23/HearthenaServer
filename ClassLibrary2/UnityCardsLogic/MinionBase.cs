@@ -1,6 +1,9 @@
 using HearthenaServer.CardServices;
 using HearthenaServer.Interfaces;
 using Newtonsoft.Json;
+using System.Collections.Generic;
+using System.Threading.Tasks;
+
 namespace WebAPI.GameTasks
 {
     public abstract class MinionBase : CardBase

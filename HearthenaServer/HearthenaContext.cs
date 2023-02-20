@@ -9,8 +9,6 @@ namespace HearthenaServer
 {
     public class HearthenaContext : DbContext
     {
-
-        // Must have constructor to work
         public HearthenaContext(DbContextOptions<HearthenaContext> options) : base(options)
         {
 
@@ -20,7 +18,8 @@ namespace HearthenaServer
         public DbSet<Player> Players { get; set; }
         public DbSet<Game> Games { get; set; }
         public DbSet<Minion> Minions { get; set; }
-        public DbSet<Hero> Heroes{ get; set; }
+        public DbSet<Hero> Heroes { get; set; }
+        public DbSet<Weapon> Weapons { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -32,9 +31,6 @@ namespace HearthenaServer
 
             this.InitializePlayerEntityBuilder(modelBuilder);
 
-            // Declares Game has two players
-            // Players dont have their game because it causes infinite regression for some reason when
-            // not using a virtual List<Player>().
             modelBuilder.Entity<Game>()
                 .HasOne(p => p.Player1)
                 .WithOne()
@@ -61,18 +57,12 @@ namespace HearthenaServer
                 v => Convert.ToBoolean(v)
                 );
 
-                        modelBuilder.Entity<Card>()
+            modelBuilder.Entity<Card>()
                 .Property(p => p.IsMinion)
                 .HasConversion(
                 v => v.ToString(),
                 v => Convert.ToBoolean(v)
                 );
-
-
-            modelBuilder.Entity<Hero>()
-                .HasOne(p => p.Weapon)
-                .WithOne(p => p.Hero)
-                .HasForeignKey<Hero>(p => p.WeaponId);
         }
 
         private void InitializePlayerEntityBuilder(ModelBuilder modelBuilder)
@@ -93,12 +83,11 @@ namespace HearthenaServer
                 .HasForeignKey(k => k.PlayerId)
                 .OnDelete(DeleteBehavior.NoAction);
 
-            // setting which generic type to the HasForeignKey<> method defines which entity must be set first.
+            // Setting which generic type to the HasForeignKey<> method defines which entity must be set first.
             playerEntity
                 .HasOne(p => p.Hero)
                 .WithOne(p => p.Player)
                 .HasForeignKey<Player>(e => e.HeroId);
-
         }
     }
 }

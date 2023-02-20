@@ -1,37 +1,37 @@
 ﻿using HearthenaServer.Entities;
 using HearthenaServer.Extensions;
 using HearthenaServer.Interfaces;
-using HearthenaServer.Models;
 using Newtonsoft.Json;
+using Shared_Models.UnityCardsLogic;
 using WebAPI.GameTasks;
 
 namespace HearthenaServer.CardServices.Spells
 {
     [GameTask(GameTaskCode.FireBall)]
-    public class FireBallLogic : SpellBase // abstract pr impleter ds unity 
+    public class FireBallLogic2 : FireSpellBase // abstract pr impleter ds unity 
     {
         private readonly IPlayerRepository _playerRepository;
         private readonly HearthenaContext _context;
 
-        public FireBallLogic()
+        public FireBallLogic2()
         {
 
         }
 
-        public FireBallLogic(HearthenaContext context, IPlayerRepository playerRepository)
+        public FireBallLogic2(HearthenaContext context, IPlayerRepository playerRepository)
         {
             _context = context;
             _playerRepository = playerRepository;
         }
 
-        public override bool IsPlayable(GameState gameState)
+        public override bool IsPlayable()
         {
-            return false;
+            return base.IsPlayable();
         }
 
         public override bool IsValidTarget() // implemented ds le abstract
         {
-            return false;
+            return base.IsValidTarget();
         }
 
         public override async Task ApplySpellEffect(Card card, Dictionary<string, string> targetParameters)

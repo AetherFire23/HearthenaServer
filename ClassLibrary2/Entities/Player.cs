@@ -17,7 +17,5 @@ namespace HearthenaServer.Entities
 
         public Guid HeroId { get; set; }
         public virtual Hero Hero { get; set; }
-
-
     }
 }

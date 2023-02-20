@@ -1,4 +1,6 @@
+using AutoMapper;
 using HearthenaServer;
+using HearthenaServer.AutoMapper;
 using HearthenaServer.Constants;
 using HearthenaServer.Entities;
 using HearthenaServer.Enums;
@@ -35,6 +37,7 @@ string connectionString = builder.Configuration.GetConnectionString("DefaultConn
 builder.Services.AddDbContext<HearthenaContext>(options
 => options.UseSqlServer(connectionString));
 
+builder.Services.AddAutoMapper(typeof(Program).Assembly);
 
 var app = builder.Build();
 
@@ -54,9 +57,6 @@ using (var scope = app.Services.CreateScope())
     IPlayerRepository playerRepository = scope.ServiceProvider.GetService<IPlayerRepository>();
     ITradeService tradeService = scope.ServiceProvider.GetService<ITradeService>();
 
-
-
-
     // setyp
     cardRepository.SetupDummyPlayerAndCards();
     var dummyGame = context.Games.FirstOrDefault();
@@ -68,17 +68,20 @@ using (var scope = app.Services.CreateScope())
     {
         {StringParameters.MinionInsertIndex, "0" }
     };
+
     await cardPlayService.PlayCard(trollcard.Id, minionIndex);
 
-
     // get troll reference and hero reference
-    var troll = playingPlayer.Minions.First();
+    var p1troll = playingPlayer.Minions.First();
     var p1hero = await tradeService.GetTarget(dummyGame.Player1.Hero.Id);
 
-    var test = Enchant.TryGetEnchant<bool>(EnchantmentType.DivineShield);
+    await tradeService.TradeCharacters(p1hero, p1troll);
+
+
 
     int i = 0;
-   // 
+
+    // 
 
     //await tradeService.TradeCharacters(p1hero, troll);
 
@@ -124,11 +127,16 @@ app.Run();
 
 static void RegisterGameTaskTypes(WebApplicationBuilder builder)
 {
-    var types = typeof(IGameTask).Assembly.GetTypes()
+
+    var types = typeof(Program).Assembly.GetTypes() // ici
         .Where(type => type.IsClass && !type.IsAbstract
             && typeof(IGameTask).IsAssignableFrom(type)
             && CustomAttributeExtensions.GetCustomAttribute<GameTaskAttribute>(type) != null);
 
+    // On enregistre pas ceux de unity
+
+
+   
     foreach (var type in types)
     {
         builder.Services.AddTransient(type);

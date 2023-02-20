@@ -12,7 +12,22 @@ namespace HearthenaServer.Migrations
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.CreateTable(
-                name: "Weapon",
+                name: "Heroes",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    Health = table.Column<int>(type: "int", nullable: false),
+                    Name = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Attack = table.Column<int>(type: "int", nullable: false),
+                    PlayerId = table.Column<Guid>(type: "uniqueidentifier", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Heroes", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Weapons",
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
@@ -23,29 +38,7 @@ namespace HearthenaServer.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Weapon", x => x.Id);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "Heroes",
-                columns: table => new
-                {
-                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    Health = table.Column<int>(type: "int", nullable: false),
-                    Name = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Attack = table.Column<int>(type: "int", nullable: false),
-                    WeaponId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    PlayerId = table.Column<Guid>(type: "uniqueidentifier", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Heroes", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_Heroes_Weapon_WeaponId",
-                        column: x => x.WeaponId,
-                        principalTable: "Weapon",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                    table.PrimaryKey("PK_Weapons", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
@@ -154,12 +147,6 @@ namespace HearthenaServer.Migrations
                 unique: true);
 
             migrationBuilder.CreateIndex(
-                name: "IX_Heroes_WeaponId",
-                table: "Heroes",
-                column: "WeaponId",
-                unique: true);
-
-            migrationBuilder.CreateIndex(
                 name: "IX_Minions_PlayerId",
                 table: "Minions",
                 column: "PlayerId");
@@ -184,13 +171,13 @@ namespace HearthenaServer.Migrations
                 name: "Minions");
 
             migrationBuilder.DropTable(
+                name: "Weapons");
+
+            migrationBuilder.DropTable(
                 name: "Players");
 
             migrationBuilder.DropTable(
                 name: "Heroes");
-
-            migrationBuilder.DropTable(
-                name: "Weapon");
         }
     }
 }

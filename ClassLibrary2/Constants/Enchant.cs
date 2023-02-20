@@ -1,23 +1,25 @@
 ﻿using HearthenaServer.Enums;
 using HearthenaServer.Models;
+using System;
+using System.Collections.Generic;
 
 namespace HearthenaServer.Constants
 {
     public static class Enchant
     {
-        private static Dictionary<EnchantmentType, object> Enchantments { get; set; } = new()
+        private static Dictionary<EnchantmentType, object> Enchantments { get; set; } = new Dictionary<EnchantmentType, object>()
         {
             { EnchantmentType.DivineShield, true},
             { EnchantmentType.Poison, true},
             { EnchantmentType.SunwellCleric, new StatBonus(){Attack = 2, Health =2 } },
         };
 
-        public static T TryGetEnchant<T>(EnchantmentType type)
+        public static T TryGetEnchant<T>(EnchantmentType enchantType)
         { 
             object enchant = null;
-            bool exists = Enchantments.TryGetValue(type, out enchant);
+            bool exists = Enchantments.TryGetValue(enchantType, out enchant);
 
-            if (!exists) throw new Exception($"Enchant ({type}) is not implemented.");
+            if (!exists) throw new Exception($"Enchant ({enchantType}) is not implemented.");
 
             return (T)enchant;
         }

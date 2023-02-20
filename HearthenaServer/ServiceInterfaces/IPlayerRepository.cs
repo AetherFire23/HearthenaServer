@@ -1,4 +1,5 @@
-﻿using HearthenaServer.Entities;
+﻿using HearthenaServer.DTO;
+using HearthenaServer.Entities;
 
 namespace HearthenaServer.Interfaces
 {
@@ -12,6 +13,6 @@ namespace HearthenaServer.Interfaces
         public Task<List<Card>> GetCardsInDeck(Player player);
         public Task<ICharacter> GetTarget(Guid targetId, Type targetType);
         public Task<ICharacter> GetTarget(Dictionary<string, string> targetParameters);
-
+        public Task<HeroDTO> CreateHeroDTO(Guid heroId);
     }
 }

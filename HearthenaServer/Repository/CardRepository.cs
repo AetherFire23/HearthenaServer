@@ -1,5 +1,8 @@
-﻿using HearthenaServer.Constants;
+﻿using AutoMapper;
+using HearthenaServer.Constants;
+using HearthenaServer.DTO;
 using HearthenaServer.Entities;
+using HearthenaServer.Extensions;
 using HearthenaServer.Interfaces;
 using Newtonsoft.Json;
 using WebAPI.GameTasks;
@@ -9,9 +12,12 @@ namespace HearthenaServer.Repository
     public class CardRepository : ICardRepository
     {
         private readonly HearthenaContext _context;
-        public CardRepository(HearthenaContext context)
+        private readonly IMapper _mapper;
+        public CardRepository(HearthenaContext context,
+            IMapper mapper)
         {
             _context = context;
+            _mapper = mapper;
         }
 
         public async Task<Card> GetCardById(Guid cardId)
@@ -62,15 +68,30 @@ namespace HearthenaServer.Repository
                 Id = ConstDef.Hero2Guid,
                 Health = 30,
                 Name = "Yea2h",
-                PlayerId = ConstDef.Player2Guid
+                PlayerId = ConstDef.Player2Guid,
+                // manque weaponId
             };
+
+
+
+            Weapon weapon = new Weapon()
+            {
+                Id = Guid.NewGuid(),
+                Attack = 10,
+                Charges = 10,
+                Type = Enums.WeaponType.FieryWarAxe,
+                HeroId = hero1.Id
+            };
+
+            // options 
 
             _context.Heroes.Add(hero1);
             _context.Heroes.Add(hero2);
+            _context.Weapons.Add(weapon);
 
             int z = 0;
 
-            await _context.SaveChangesAsync();
+            await _context.SaveChangesAsync(); // bug ici ! une reference nest pas correct
             _context.Players.Add(player);
             _context.Players.Add(player2);
 

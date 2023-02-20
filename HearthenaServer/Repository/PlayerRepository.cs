@@ -1,6 +1,9 @@
-﻿using HearthenaServer.Entities;
+﻿using AutoMapper;
+using HearthenaServer.DTO;
+using HearthenaServer.Entities;
 using HearthenaServer.Extensions;
 using HearthenaServer.Interfaces;
+using HearthenaServer.Models;
 using Microsoft.AspNetCore.Mvc.ModelBinding.Binders;
 using Microsoft.EntityFrameworkCore;
 using System.Runtime.Intrinsics.X86;
@@ -10,9 +13,13 @@ namespace HearthenaServer.Repository
     public class PlayerRepository : IPlayerRepository
     {
         private readonly HearthenaContext _context;
-        public PlayerRepository(HearthenaContext context)
+        private readonly IMapper _mapper;
+
+        public PlayerRepository(HearthenaContext context,
+            IMapper mapper)
         {
             _context = context;
+            _mapper = mapper;
         }
         public async Task<Player> GetPlayerById(Guid id)
         {
@@ -29,6 +36,20 @@ namespace HearthenaServer.Repository
             if (attackedTarget is null) throw new ArgumentNullException($"Either {targetId} or {targetType} was null.");
 
             return attackedTarget;
+        }
+
+        public async Task<GameState> GetGameState(Guid playerId)
+        {
+            var player = await GetPlayerById(playerId);
+            var game = await GetGameById(player.GameId);
+
+            GameState gameState = new GameState()
+            {
+                Player = player,
+                Player2 = game.
+            };
+
+
         }
 
         public async Task<ICharacter> GetTarget(Dictionary<string, string> targetParameters)
@@ -66,6 +87,16 @@ namespace HearthenaServer.Repository
         {
             var cardsInDeck = await _context.Cards.Where(c => c.IsInHand == false && c.OwnerId == player.Id).ToListAsync();
             return cardsInDeck;
+        }
+
+        public async Task<HeroDTO> CreateHeroDTO(Guid heroId)
+        {
+            var heroEntity = await _context.Heroes.FirstOrDefaultAsync(x => x.Id == heroId);
+            var heroDto = _mapper.Map<HeroDTO>(heroEntity);
+
+            heroDto.Weapon = await _context.Weapons.FirstOrDefaultAsync(x => x.HeroId == heroId);
+
+            return heroDto;
         }
     }
 }

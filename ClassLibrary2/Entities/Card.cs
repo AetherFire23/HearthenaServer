@@ -1,6 +1,8 @@
 ﻿using HearthenaServer.Constants;
 using HearthenaServer.Enums;
 using Newtonsoft.Json;
+using System;
+using System.Collections.Generic;
 using WebAPI.GameTasks;
 
 namespace HearthenaServer.Entities
